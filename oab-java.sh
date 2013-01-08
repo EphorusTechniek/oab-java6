@@ -426,8 +426,11 @@ git checkout ${TAG} >> "$log" 2>&1 &
 pid=$!;progress $pid
 
 # Cet the current Debian package version and package urgency
-DEB_VERSION=`head -n1 ${WORK_PATH}/src/debian/changelog | cut -d'(' -f2 | cut -d')' -f1 | cut -d'~' -f1`
-DEB_URGENCY=`head -n1 ${WORK_PATH}/src/debian/changelog | cut -d'=' -f2`
+VERSION_LINE="sun-java6 (6.26-3) unstable; urgency=low"
+#VERSION_LINE="sun-java6 (6.31-2) unstable; urgency=low"
+#VERSION_LINE="sun-java6 (6.38-1) unstable; urgency=high"
+DEB_VERSION=`echo -n $VERSION_LINE| cut -d'(' -f2 | cut -d')' -f1 | cut -d'~' -f1`
+DEB_URGENCY=`echo -n $VERSION_LINE| cut -d'=' -f2`
 
 # Determine the currently supported Java version and update
 JAVA_VER=`echo ${DEB_VERSION} | cut -d'.' -f1`
@@ -564,7 +567,7 @@ uniq /tmp/override > ${WORK_PATH}/deb/override
 # Create the 'apt' Packages.gz
 ncecho " [x] Creating Packages.gz file "
 cd ${WORK_PATH}/deb
-dpkg-scanpackages . override 2>/dev/null > Packages
+dpkg-scanpackages --multiversion . 2>/dev/null > Packages
 cat Packages | gzip -c9 > Packages.gz
 rm ${WORK_PATH}/deb/override 2>/dev/null
 cecho success
